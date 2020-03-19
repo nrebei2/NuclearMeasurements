@@ -12,7 +12,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 np.set_printoptions(threshold=sys.maxsize)
 
 Out = []
-xl = pd.ExcelFile('../Data/read (difulvio@illinois.edu).xls')
+xl = pd.ExcelFile('../Data/pointSource.xls')
 
 Sheets = ['z =0', 'Sheet2', 'Sheet3', 'Sheet4', 'Sheet5', 'Sheet6']
 def fillOut(Out, sheet):
@@ -56,48 +56,83 @@ for y in range(0, N):
         else:
             index += 1
 
-# Calculating In with a Bounded-Variable Least-Squares algorithm
-In = op.lsq_linear(R, Out, (0, np.inf),
-                       method='bvls',
-                       #method='trf',
-                       tol=1e-30,
-                       max_iter=400,
-                       verbose=0)['x']
+fig,ax = plt.subplots(6,3,figsize=(10,10))
 
-activity = np.sum(In)
-print("The activity using BLVS is {} Bq".format(activity))
+def SolveAndGraph(R, Out, x, y):
+    # Calculating In with a Bounded-Variable Least-Squares algorithm
+    In = op.lsq_linear(R, Out, (0, np.inf),
+                           method='bvls',
+                           #method='trf',
+                           tol=1e-30,
+                           max_iter=400,
+                           verbose=0)['x']
 
-indexIn = 0
-Z = np.zeros((N, N))
-for b in range(0, N):
-    for a in range(0, N):
-        if (b, a) in zero_pixels:
-            Z[b][a] = 0
-        else:
-            Z[b][a] = In[indexIn]
-            indexIn += 1
+    activity = np.sum(In)
+    print("The activity using BLVS is {} Bq".format(activity))
 
-print(In)
-fig,ax = plt.subplots()
-matfig = ax.imshow(Z, extent=[-6,6,-6,6], origin='lower')
-# create an axes on the right side of ax. The width of cax will be 5%
-# of ax and the padding between cax and ax will be fixed at 0.05 inch.
-divider = make_axes_locatable(ax)
-cax = divider.append_axes("right", size="5%", pad=0.05)
-plt.colorbar(matfig, cax=cax)
+    indexIn = 0
+    Z = np.zeros((N, N))
+    for b in range(0, N):
+        for a in range(0, N):
+            if (b, a) in zero_pixels:
+                Z[b][a] = 0
+            else:
+                Z[b][a] = In[indexIn]
+                indexIn += 1
 
-# plot the pipe
-center = (0, 0)  # in px
-circle1 = plt.Circle(center, innerradius, color='r', fill=False)
-circle2 = plt.Circle(center, outerradius, color='r', fill=False)
-ax.add_artist(circle1)
-ax.add_artist(circle2)
+    print(In)
 
-# labels
-ax.set_xlabel('x (cm)')
-ax.set_ylabel('y (cm)')
-ax.set_title('z = {} cm'.format(0))
+    matfig = ax[x][y].imshow(Z, extent=[-6,6,-6,6], origin='lower')
+    # create an axes on the right side of ax. The width of cax will be 5%
+    # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+    divider = make_axes_locatable(ax[x][y])
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    plt.colorbar(matfig, cax=cax)
 
-fig.tight_layout()
-matplotlib.rcParams.update({'font.size': 22})
+    # plot the pipe
+    center = (0, 0)  # in px
+    circle1 = plt.Circle(center, innerradius, color='r', fill=False)
+    circle2 = plt.Circle(center, outerradius, color='r', fill=False)
+    ax[x][y].add_artist(circle1)
+    ax[x][y].add_artist(circle2)
+
+    # labels
+    ax[x][y].set_xlabel('x (cm)')
+    ax[x][y].set_ylabel('y (cm)')
+    ax[x][y].set_title('z = {} cm'.format(0))
+
+    fig.tight_layout()
+
+
+counterClockwise = []
+for x in range(1, 18):
+    counterClockwise.append(x)
+
+clockwise = []
+for x in range(18, 35):
+    clockwise.append(x)
+
+CurrentResponses = [R[0]]
+CurrentOut = [Out[0]]
+
+print(counterClockwise)
+
+k = 0
+for i in range(6):
+    for j in range(3):
+        if i==0 and j==0:
+            SolveAndGraph(CurrentResponses, CurrentOut, i, j)
+            continue
+        if i==6 and j==3:
+            continue
+        CurrentResponses.append(R[counterClockwise[k]])
+        CurrentResponses.append(R[clockwise[k]])
+
+        CurrentOut.append(Out[counterClockwise[k]])
+        CurrentOut.append(Out[clockwise[k]])
+
+        SolveAndGraph(CurrentResponses, CurrentOut, i, j)
+        print(k)
+        k += 1
+
 plt.show()
