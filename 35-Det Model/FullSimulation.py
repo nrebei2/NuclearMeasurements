@@ -12,9 +12,9 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 np.set_printoptions(threshold=sys.maxsize)
 
 Out = []
-xl = pd.ExcelFile('../Data/read (difulvio@illinois.edu).xls')
+xl = pd.ExcelFile('../Data/source2.xls')
 
-Sheets = ['z =0', 'Sheet2', 'Sheet3', 'Sheet4', 'Sheet5', 'Sheet6']
+Sheets = ['Sheet1', 'Sheet2', 'Sheet3', 'Sheet4', 'Sheet5', 'Sheet6']
 
 
 def fillOut(Out, sheet):
@@ -93,7 +93,7 @@ def changeOutsiders(R):
     G = np.ravel(G)
     return np.multiply(R,G)
 
-WantToGraph = False
+WantToGraph = True
 if not WantToGraph:
     R0 = np.array(deleteOutsiders(R0))
     R1 = np.array(deleteOutsiders(R1))
@@ -120,32 +120,36 @@ R = np.vstack((np.hstack((R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, Zero, Zero
                np.hstack((Zero, Zero, Zero, Zero, Zero, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5))))
 
 if WantToGraph:
-    fig, ax = plt.subplots(1,35)
+    fig, ax = plt.subplots(5,7,figsize=(7,7))
+    dets = []
+    for i in range(101, 136):
+        dets.append(i)
 
-    dets = np.array([17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
-                    29, 30, 31, 32, 33, 34])
+    k = 0
+    for j in range(7):
+        for i in range(5):
+            matfig = ax[i][j].imshow((R0[k]).reshape(12,12), extent=[-6,6,-6,6], origin='lower')
+            # # create an axes on the right side of ax. The width of cax will be 5%
+            # # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+            # divider = make_axes_locatable(ax[i][j])
+            # cax = divider.append_axes("right", size="5%", pad=0.05)
+            # plt.colorbar(matfig, cax=cax)
 
-    for j, detj in enumerate(dets):
-        matfig = ax[j].imshow((R0[detj]).reshape(12,12), extent=[-6,6,-6,6], origin='lower')
-        # # create an axes on the right side of ax. The width of cax will be 5%
-        # # of ax and the padding between cax and ax will be fixed at 0.05 inch.
-        # divider = make_axes_locatable(ax[i][j])
-        # cax = divider.append_axes("right", size="5%", pad=0.05)
-        # plt.colorbar(matfig, cax=cax)
+            # plot the pipe
+            innerradius = innerradius / 12 * 12  # in px
+            outerradius = outerradius / 12 * 12 # in px
+            center = (0, 0)  # in px
+            circle1 = plt.Circle(center, innerradius, color='r', fill=False)
+            circle2 = plt.Circle(center, outerradius, color='r', fill=False)
+            ax[i][j].add_artist(circle1)
+            ax[i][j].add_artist(circle2)
 
-        # plot the pipe
-        innerradius = innerradius / 12 * 12  # in px
-        outerradius = outerradius / 12 * 12 # in px
-        center = (0, 0)  # in px
-        circle1 = plt.Circle(center, innerradius, color='r', fill=False)
-        circle2 = plt.Circle(center, outerradius, color='r', fill=False)
-        ax[j].add_artist(circle1)
-        ax[j].add_artist(circle2)
-
-        # labels
-        ax[j].set_xlabel('x (cm)')
-        ax[j].set_title('Det {}'.format(detj))
-    ax[0].set_ylabel('y (cm)')
+            # labels
+            ax[i][j].set_xlabel('x (cm)')
+            ax[i][j].set_title('Det {}'.format(dets[k]))
+            k += 1
+            ax[i][0].set_ylabel('y (cm)')
+    fig.tight_layout()
     plt.show()
     # plt.savefig("matfig")
 
@@ -168,6 +172,7 @@ if WantToGraph:
 
     # plt.imshow(In[4].reshape(12,12))
     fig,ax = plt.subplots(4,4,figsize=(10,10))
+    fig.suptitle('Source2', fontsize=16)
     for i in range(4):
         for j in range(4):
             n = 3*i + j
