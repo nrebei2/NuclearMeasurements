@@ -25,14 +25,14 @@ def get_spectrum(filepath, time):
 # In[ ]:
 
 
-raw_paths = ["Data/CH_0@DT5730_1770_Espectrum_CalibrationCH1 FINAL_2_20191113_231257.txt",
-             "Data/CH_1@DT5730_1770_Espectrum_CalibrationCH1_20191101_233347.txt",
-             "Data/CH_2@DT5730_1770_Espectrum_CalibrationCH2_20191111_223737.txt"]
-bk_paths = ["Data/CH_0@DT5730_1770_Espectrum_CH0 Background_20191118_205027.txt",
-            "Data/CH_1@DT5730_1770_Espectrum_CH1 CH2 Background_3_20191114_214529.txt",
-            "Data/CH_2@DT5730_1770_Espectrum_CH1 CH2 Background_3_20191114_214529.txt"]
+raw_paths = ["../Data/CH_0@DT5730_1770_Espectrum_CalibrationCH1 FINAL_2_20191113_231257.txt",
+             "../Data/CH_1@DT5730_1770_Espectrum_CalibrationCH1_20191101_233347.txt",
+             "../Data/CH_2@DT5730_1770_Espectrum_CalibrationCH2_20191111_223737.txt"]
+bk_paths = ["../Data/CH_0@DT5730_1770_Espectrum_CH0 Background_20191118_205027.txt",
+            "../Data/CH_1@DT5730_1770_Espectrum_CH1 CH2 Background_3_20191114_214529.txt",
+            "../Data/CH_2@DT5730_1770_Espectrum_CH1 CH2 Background_3_20191114_214529.txt"]
 raw_spectra = np.array([get_spectrum(rawf, 5) for rawf in raw_paths])  # 5 hours
-bk_spectra  = np.array([get_spectrum(bkf, 5) for bkf in bk_paths])  # 5 hours
+bk_spectra = np.array([get_spectrum(bkf, 5) for bkf in bk_paths])  # 5 hours
 
 
 # In[ ]:
@@ -56,12 +56,12 @@ for n in np.arange(3):
     ax[n][0].set_ylim(ylims[n])
     ax[n][0].set_title('CH%s'%n)
     ax[n][0].set_xlabel('Channel number')
-    ax[n][0].set_ylabel('Count rate ($h^{-1}$)') 
+    ax[n][0].set_ylabel('Count rate ($h^{-1}$)')
     ax[n][0].legend()
     ax[n][1].plot(cali_spectra[n,:,0],cali_spectra[n,:,1], label='Calibrated')
     ax[n][1].set_title('CH%s'%n)
     ax[n][1].set_xlabel('Energy (keV)')
-    ax[n][1].set_ylabel('Count rate ($h^{-1}$)') 
+    ax[n][1].set_ylabel('Count rate ($h^{-1}$)')
     ax[n][1].set_xlim([0,1000])
     ax[n][1].set_ylim(ylims[n])
     ax[n][1].legend()
@@ -128,7 +128,7 @@ for n in np.arange(3):
                np.array([0,cali_spectra[n,low_index,1],cali_spectra[n,up_index,1],0]),alpha=0.4,label='Compton=%.1f'%compton_sum)
     ax[n].set_title('CH%s'%n)
     ax[n].set_xlabel('Energy (keV)')
-    ax[n].set_ylabel('Count rate ($h^{-1}$)') 
+    ax[n].set_ylabel('Count rate ($h^{-1}$)')
     ax[n].set_xlim([0,1000])
     ax[n].set_ylim(ylims[n])
     ax[n].legend()
@@ -228,14 +228,13 @@ for y in range(0, N):
         resp = response(A_0, area, intrinsic_eff, c, h)
         # print(resp)
         if (x_p)**2 + (y_p)**2 > innerradius**2:
-            zero_pixels.append((x, y))
-            #respMatrix.append([0, 0, 0]) ## for plot only
+            #zero_pixels.append((x, y))
+            respMatrix.append([0, 0, 0]) ## for plot only
         else:
             respMatrix.append(resp)
             # c_sum_list.append(c_1 + c_2 + c_3)
 respMatrix = np.array(respMatrix)
 respMatrix = np.transpose(respMatrix)
-# print(respMatrix)
 
 # In[238]:
 
@@ -265,12 +264,12 @@ fig.tight_layout()
 # In[ ]:
 
 
-raw_paths = ['Data/CH_0@DT5730_1770_Espectrum_Pipe Measurement 3 Detectors 2 cs-137_20191018_150203.txt',
-             'Data/CH_1@DT5730_1770_Espectrum_Pipe Measurement 3 Detectors 2 cs-137_20191018_150207.txt',
-             'Data/CH_2@DT5730_1770_Espectrum_Pipe Measurement 3 Detectors 2 cs-137_20191018_150159.txt']
-bbk_paths = ["Data/CH_0@DT5730_1770_Espectrum_3 Detector Collimated Background Count_20191014_231251.txt",
-            "Data/CH_1@DT5730_1770_Espectrum_3 Detector Collimated Background Count_20191014_231251.txt",
-            "Data/CH_2@DT5730_1770_Espectrum_3 Detector Collimated Background Count_20191014_231251.txt"]
+raw_paths = ['../Data/CH_0@DT5730_1770_Espectrum_Pipe Measurement 3 Detectors 2 cs-137_20191018_150203.txt',
+             '../Data/CH_1@DT5730_1770_Espectrum_Pipe Measurement 3 Detectors 2 cs-137_20191018_150207.txt',
+             '../Data/CH_2@DT5730_1770_Espectrum_Pipe Measurement 3 Detectors 2 cs-137_20191018_150159.txt']
+bbk_paths = ["../Data/CH_0@DT5730_1770_Espectrum_3 Detector Collimated Background Count_20191014_231251.txt",
+            "../Data/CH_1@DT5730_1770_Espectrum_3 Detector Collimated Background Count_20191014_231251.txt",
+            "../Data/CH_2@DT5730_1770_Espectrum_3 Detector Collimated Background Count_20191014_231251.txt"]
 raw_spectra = np.array([get_spectrum(rawf, 5) for rawf in raw_paths])  # 5 hours
 bk_spectra  = np.array([get_spectrum(bkf, 5) for bkf in bk_paths])  # 5 hours
 cali_coeffs = [661.7/427, 661.7/1688, 661.7/543]
@@ -291,12 +290,12 @@ for n in np.arange(3):
     ax[n][0].set_ylim(ylims[n])
     ax[n][0].set_title('CH%s'%n)
     ax[n][0].set_xlabel('Channel number')
-    ax[n][0].set_ylabel('Count rate ($h^{-1}$)') 
+    ax[n][0].set_ylabel('Count rate ($h^{-1}$)')
     ax[n][0].legend()
     ax[n][1].plot(cali_spectra[n,:,0],cali_spectra[n,:,1], label='Calibrated')
     ax[n][1].set_title('CH%s'%n)
     ax[n][1].set_xlabel('Energy (keV)')
-    ax[n][1].set_ylabel('Count rate ($h^{-1}$)') 
+    ax[n][1].set_ylabel('Count rate ($h^{-1}$)')
     ax[n][1].set_xlim([0,1000])
     ax[n][1].set_ylim(ylims[n])
 
@@ -333,7 +332,7 @@ for n in np.arange(3):
                np.array([0,cali_spectra[n,low_index,1],cali_spectra[n,up_index,1],0]),alpha=0.4,label='Compton=%.1f'%compton_sum)
     ax[n].set_title('CH%s'%n)
     ax[n].set_xlabel('Energy (keV)')
-    ax[n].set_ylabel('Count rate ($h^{-1}$)') 
+    ax[n].set_ylabel('Count rate ($h^{-1}$)')
     ax[n].set_xlim([0,1000])
     ax[n].set_ylim(ylims[n])
     ax[n].legend()
@@ -354,6 +353,7 @@ print(respMatrix)
 
 
 Out = peak_sums
+print(Out)
 # print(Out.shape)
 
 
@@ -367,14 +367,14 @@ import scipy.optimize as op
 In = op.lsq_linear(respMatrix,
                   Out, (0, np.inf),
                     method='bvls',
-                #    method='trf',
+                    #method='trf',
                     tol=1e-30,
-                    max_iter=10,#    verbose=2
+                    max_iter=10000,    verbose=2
                    )['x']
 
 # calculate the activity
 activity = np.sum(In)/3600
-print("The activity using BLVS is {} Bq".format(activity))
+print("The activity using TRF is {} Bq".format(activity))
 
 
 # $A_{cal} = 61801.8 \text{ Bq}, A_{real} = 70800 \text{ Bq}$
@@ -400,13 +400,27 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 plt.figure()
 ax = plt.gca()
-matfig = ax.matshow(Z)
+matfig = ax.imshow(Z, extent=[-6,6,-6,6], origin='lower')
 
 # create an axes on the right side of ax. The width of cax will be 5%
 # of ax and the padding between cax and ax will be fixed at 0.05 inch.
 divider = make_axes_locatable(ax)
 cax = divider.append_axes("right", size="5%", pad=0.05)
 plt.colorbar(matfig, cax=cax)
+
+# plot the pipe
+innerradius = innerradius / W * N  # in px
+outerradius = outerradius / W * N  # in px
+center = (0, 0)  # in px
+circle1 = plt.Circle(center, innerradius, color='r', fill=False)
+circle2 = plt.Circle(center, outerradius, color='r', fill=False)
+ax.add_artist(circle1)
+ax.add_artist(circle2)
+
+# labels
+ax.set_xlabel('x (cm)')
+ax.set_ylabel('y (cm)')
+plt.savefig("matfig")
 
 
 # In[330]:
@@ -492,6 +506,16 @@ activity = np.sum(x)/3600
 print("The activity using FISTA is {} Bq".format(activity))
 
 
-plt.show()
+#plt.show()
 
 
+A = respMatrix
+b = Out
+
+import scipy.linalg as linalg
+import numpy as np  # same matrix A and B as in LU decomposition
+print(A)
+print(b)
+q, r = np.linalg.qr(A)
+p = np.dot(q.T, b)
+print(np.dot(np.linalg.inv(r), p))

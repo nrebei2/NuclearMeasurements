@@ -115,15 +115,15 @@ df = pd.DataFrame (R)
 
 ## save to xlsx file
 
-filepath = 'Data/R_cut.xlsx'
+filepath = '../Data/R_cut.xlsx'
 
 df.to_excel(filepath, index=False)
 
 # Calculating In with a Bounded-Variable Least-Squares algorithm
 
 In = op.lsq_linear(R, Out, (0, np.inf),
-                       method='bvls',
-                       #method='trf',
+                       #method='bvls',
+                       method='trf',
                        tol=1e-30,
                        max_iter=400,
                        verbose=0)['x']

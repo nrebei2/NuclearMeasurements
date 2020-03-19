@@ -1,3 +1,4 @@
+import matplotlib
 import numpy as np
 import scipy.optimize as op
 import pandas as pd
@@ -10,20 +11,27 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 np.set_printoptions(threshold=sys.maxsize)
 
-Out = [0.00000219, 0.0000028, 0.00000286]
+Out = []
+xl = pd.ExcelFile('../Data/read (difulvio@illinois.edu).xls')
+
+Sheets = ['z =0', 'Sheet2', 'Sheet3', 'Sheet4', 'Sheet5', 'Sheet6']
+def fillOut(Out, sheet):
+    df = xl.parse(sheet)
+    Out.append(df.iloc[:, 0])
+
+fillOut(Out, Sheets[0])
+Out = np.array(Out[0]).tolist()
 
 R = []
-xl = pd.ExcelFile('Data/Resp_z_0_6.xls')
+xl = pd.ExcelFile('../Data/respMatr.xls')
 
-Sheets = ['z0', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6']
+Sheets = ['z 0', 'z 1', 'z 2', 'z 3', 'z 4', 'z 5']
 def fillResponse(Rx, sheet):
     df = xl.parse(sheet)
-    Rx.append(df.iloc[:, 2])
-    Rx.append(df.iloc[:, 20])
-    Rx.append(df.iloc[:, 38])
-
+    for x in range(1, 36):
+        Rx.append(df.iloc[x, :])
 fillResponse(R, Sheets[0])
-
+R = np.array(R).tolist()
 
 # # M * N is the number of pixels
 N = 12
@@ -43,15 +51,10 @@ for y in range(0, N):
         y_p = -5.5 + (y) * 1
         if (x_p) ** 2 + (y_p) ** 2 > innerradius ** 2:
             zero_pixels.append((x, y))
-            for k in range(0,3):
+            for k in range(0,35):
                 del R[k][index]
-        index += 1
-
-## convert your array into a dataframe
-df = pd.DataFrame (R)
-## save to xlsx file
-filepath = 'Data/3DetR_cut.xlsx'
-df.to_excel(filepath, index=False)
+        else:
+            index += 1
 
 # Calculating In with a Bounded-Variable Least-Squares algorithm
 In = op.lsq_linear(R, Out, (0, np.inf),
@@ -59,14 +62,10 @@ In = op.lsq_linear(R, Out, (0, np.inf),
                        #method='trf',
                        tol=1e-30,
                        max_iter=400,
-                       verbose=2)['x']
+                       verbose=0)['x']
 
 activity = np.sum(In)
 print("The activity using BLVS is {} Bq".format(activity))
-
-#print(abs(Out - np.matmul(R, In))/Out)
-print(Out)
-print(np.matmul(R, In))
 
 indexIn = 0
 Z = np.zeros((N, N))
@@ -78,10 +77,27 @@ for b in range(0, N):
             Z[b][a] = In[indexIn]
             indexIn += 1
 
+print(In)
+fig,ax = plt.subplots()
+matfig = ax.imshow(Z, extent=[-6,6,-6,6], origin='lower')
+# create an axes on the right side of ax. The width of cax will be 5%
+# of ax and the padding between cax and ax will be fixed at 0.05 inch.
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="5%", pad=0.05)
+plt.colorbar(matfig, cax=cax)
 
-plt.imshow(Z, extent=[-6,6,-6,6], origin='lower')
 # plot the pipe
 center = (0, 0)  # in px
-plt.Circle(center, innerradius, color='r', fill=False)
-plt.Circle(center, outerradius, color='r', fill=False)
+circle1 = plt.Circle(center, innerradius, color='r', fill=False)
+circle2 = plt.Circle(center, outerradius, color='r', fill=False)
+ax.add_artist(circle1)
+ax.add_artist(circle2)
+
+# labels
+ax.set_xlabel('x (cm)')
+ax.set_ylabel('y (cm)')
+ax.set_title('z = {} cm'.format(0))
+
+fig.tight_layout()
+matplotlib.rcParams.update({'font.size': 22})
 plt.show()

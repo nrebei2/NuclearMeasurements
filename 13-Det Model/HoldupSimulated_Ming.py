@@ -24,7 +24,7 @@ N = 12
 
 # Filling out lists of calculated responses and out
 Sheets = ['Sheet1', 'Sheet2', 'Sheet3', 'Sheet4', 'Sheet5', 'Sheet6']
-xl = pd.ExcelFile('Data/Resp_z_0_6singleSource.xls')
+xl = pd.ExcelFile('../Data/Resp_z_0_6singleSource.xls')
 Out = []
 
 def fillOut(Out, sheet):
@@ -47,7 +47,7 @@ Out = np.asarray(Out)
 
 # xl = pd.ExcelFile('/content/drive/My Drive/Holdup/data/Resp_z_0_6.xls')
 # Sheets = ['z0', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6']
-xl = pd.ExcelFile('Data/Resp_z_0_6.xls')
+xl = pd.ExcelFile('../Data/Resp_z_0_6.xls')
 Sheets = ['z0', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6']
 def fillResponse(sheet):
     Rx=[]
@@ -113,7 +113,7 @@ print(R.shape)
 df = pd.DataFrame (R)
 # ## save to xlsx file
 
-filepath = 'Data/R.xlsx'
+filepath = '../Data/R.xlsx'
 
 df.to_excel(filepath, index=False)
 
@@ -244,7 +244,7 @@ for i in range(6):
 df = pd.DataFrame(In)
 # ## save to xlsx file
 
-filepath = 'Data/In.xlsx'
+filepath = '../Data/In.xlsx'
 
 df.to_excel(filepath, index=False)
 
