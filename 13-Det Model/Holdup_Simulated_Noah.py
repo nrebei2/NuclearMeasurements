@@ -115,9 +115,9 @@ df = pd.DataFrame (R)
 
 ## save to xlsx file
 
-filepath = '../Data/R_cut.xlsx'
+#filepath = '../Data/R_cut.xlsx'
 
-df.to_excel(filepath, index=False)
+#df.to_excel(filepath, index=False)
 
 # Calculating In with a Bounded-Variable Least-Squares algorithm
 

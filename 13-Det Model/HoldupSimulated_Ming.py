@@ -113,9 +113,9 @@ print(R.shape)
 df = pd.DataFrame (R)
 # ## save to xlsx file
 
-filepath = '../Data/R.xlsx'
+#filepath = '../Data/R.xlsx'
 
-df.to_excel(filepath, index=False)
+#df.to_excel(filepath, index=False)
 
 
 # In[ ]:
@@ -244,9 +244,9 @@ for i in range(6):
 df = pd.DataFrame(In)
 # ## save to xlsx file
 
-filepath = '../Data/In.xlsx'
+#filepath = '../Data/In.xlsx'
 
-df.to_excel(filepath, index=False)
+#df.to_excel(filepath, index=False)
 
 plt.show()
 

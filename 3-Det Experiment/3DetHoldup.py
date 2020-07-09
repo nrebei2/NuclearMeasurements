@@ -12,6 +12,7 @@ import numpy as np
 # # Calibration
 
 # In[ ]:
+from scipy.sparse.linalg import svds
 
 
 def get_spectrum(filepath, time):
@@ -444,25 +445,23 @@ plt.savefig("matfig")
 # In[ ]:
 
 
-# initialization
-import scipy
+#initialization
+
 A = respMatrix
-w,v = scipy.linalg.eigh(np.matmul(A.T,A))
-Lf = np.max(abs(w))
-
-
+u, s, vt = svds(A, 1, which='LM')  # svd
+L = s[0] ** 2
 # In[ ]:
 
 
 x = z = np.ones(A.shape[1])
 y = Out
 t = 1
-lam = 1E-10
-max_iter = 100000
+lam = 1E-8
+max_iter = 2000
 err = np.zeros(max_iter)
 for k in np.arange(0,max_iter):
-    xp = z - 1/Lf * A.T@(A@z-y)
-    xp = np.maximum(xp-lam/Lf, 0)
+    xp = z - 1/L * A.T@(A@z-y)
+    xp = np.maximum(xp-lam/L, 0)
     tp = (1+np.sqrt(1+4* t**2)) / 2
     z = xp + (t-1) / tp *(xp-x)
     # update
@@ -470,8 +469,11 @@ for k in np.arange(0,max_iter):
     x = xp
     # err[k] = np.linalg.norm(y - A@x)
     err[k] = abs(np.sum(x)/3600 - 70800) / 70800
-
-
+    # Stops loop when error difference is small -- Prevents overfitting??
+    #if np.abs(err[k] - err[k-1])/err[k] <= 10 ** -4.5: #or err[k] <= 10E-3 and k >= 1:
+     #   break
+    if k == 250:
+        break
 # In[334]:
 
 
@@ -505,6 +507,45 @@ plt.colorbar(matfig, cax=cax)
 activity = np.sum(x)/3600
 print("The activity using FISTA is {} Bq".format(activity))
 
+import seaborn as sns
+sns.set()
+
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+indexIn = 0
+Z = np.zeros((N, N))
+for b in range(0, N):
+    for a in range(0, N):
+        if (b, a) in zero_pixels:
+            Z[b][a] = 0
+        else:
+            Z[b][a] = x[indexIn]
+            indexIn += 1
+
+plt.figure()
+ax = plt.gca()
+matfig = ax.imshow(Z, extent=[-6,6,-6,6], origin='lower')
+
+# create an axes on the right side of ax. The width of cax will be 5%
+# of ax and the padding between cax and ax will be fixed at 0.05 inch.
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="5%", pad=0.05)
+plt.colorbar(matfig, cax=cax)
+
+# plot the pipe
+innerradius = innerradius / W * N  # in px
+outerradius = outerradius / W * N  # in px
+center = (0, 0)  # in px
+circle1 = plt.Circle(center, innerradius, color='r', fill=False)
+circle2 = plt.Circle(center, outerradius, color='r', fill=False)
+ax.add_artist(circle1)
+ax.add_artist(circle2)
+
+# labels
+ax.set_xlabel('x (cm)')
+ax.set_ylabel('y (cm)')
+plt.savefig("matfig")
+
 
 #plt.show()
 
@@ -512,10 +553,110 @@ print("The activity using FISTA is {} Bq".format(activity))
 A = respMatrix
 b = Out
 
-import scipy.linalg as linalg
-import numpy as np  # same matrix A and B as in LU decomposition
-print(A)
-print(b)
-q, r = np.linalg.qr(A)
-p = np.dot(q.T, b)
-print(np.dot(np.linalg.inv(r), p))
+# import scipy.linalg as linalg
+# import numpy as np  # same matrix A and B as in LU decomposition
+# print(A)
+# print(b)
+# q, r = np.linalg.qr(A)
+# p = np.dot(q.T, b)
+# print(np.dot(np.linalg.inv(r), p))
+
+# print(A.shape)
+# print(np.linalg.matrix_rank(A))
+# print("The activity using closed form least squares solution is {} Bq".format(np.sum(np.matmul(np.linalg.inv(np.matmul(np.transpose(A), A)), np.matmul(np.transpose(A), b)))/3600))
+
+
+
+max = Out.max()
+Out = Out/max
+
+def noisy_val_grad(theta_hat, data_, label_, deg, lamba):
+    gradient = np.zeros_like(theta_hat)
+    loss = 0
+
+    for i in range(data_.shape[0]):
+        x_ = data_[i, :].reshape(-1, 1)
+        y_ = label_[i, 0]
+        err = np.matmul(np.transpose(x_), theta_hat) - y_
+        grad = 2 * (np.matmul(np.transpose(x_), theta_hat) - y_) * x_ * (
+                    np.absolute(np.matmul(np.transpose(x_), theta_hat) - y_) ** (deg - 2)) \
+               #+ lamba * np.abs(theta_hat[i])/theta_hat[i]
+        #print(grad.shape)
+        l = np.abs(err) ** deg
+        loss += l / data_.shape[0]
+        gradient += np.divide(grad, data_.shape[0])
+
+    return loss, gradient
+
+Out = np.asarray([[i] for i in Out])
+lr = 0.2
+max_iter = 50000
+theta_init = np.random.random((np.shape(respMatrix)[1], 1)) * 0
+deg_ = 2
+data_num = np.shape(respMatrix)[0]
+batch_size = data_num
+beta_1 = 0.9
+beta_2 = 0.999
+m = 0
+nu = 0
+e = 10E-8
+G = 0
+
+lam = 10E-9
+#u, s, vt = svds(respMatrix, 1, which='LM')  # svd
+#L = s[0] ** 2
+#lr = 1/L
+
+# initialize momentum
+mew = 0.9999
+v = 0
+
+In = theta_init.copy()
+err = np.zeros(max_iter)
+stuff = []
+for t in range(max_iter):
+    #print(t)
+    idx = np.random.choice(data_num, batch_size)
+    train_loss, gradient = noisy_val_grad(In, respMatrix, Out, deg_, 0)
+    #err[t] = train_loss
+    err[t] = np.linalg.norm(Out - respMatrix.dot(In))
+
+
+    # ADAGRAD
+    # stuff.append(gradient ** 2)
+    # G = sum(stuff)
+    # In = In - (gradient * (lr / (np.sqrt(G + e))))
+
+    # GD
+    #In = In - lr * gradient
+
+    # ADAM
+    m = beta_1 * m + (1 - beta_1) * gradient
+    nu = beta_2 * nu + (1 - beta_2) * np.square(gradient)
+    m_bar = m / (1 - beta_1 ** (t + 1))
+    nu_bar = nu / (1 - beta_2 ** (t + 1))
+    In = In - lr * m_bar / (np.sqrt(nu_bar) + e)
+
+    # Nesterov accelerated gradient
+    # _, gradient = noisy_val_grad(In - mew * v, R, Out, deg_, 0)
+    # v = mew * v + lr * gradient
+    # In = In - v
+
+    In = np.asarray([[i] for i in np.maximum(In, 0).ravel()])
+    # 10E-4 works best for source1
+    #if np.abs(err[t] - err[t-1])/err[t] <= 10E-4: # or err[t] <= 10E-3 and t >= 1:
+        #break
+
+fig, ax1 = plt.subplots(1, 1, figsize=(8, 4.5))
+# ax1.set_title("Reconstruction\nFiltered back projection")
+ax1.plot(np.arange(0, max_iter), err)
+# ax1.set_yscale('log')
+ax1.set_xlabel('Iteration')
+ax1.set_ylabel('$||Ax-y||$')
+#print(np.matmul(R,In) - Out)
+#print(np.matmul(R,In) - Out)
+
+In = In*max
+print("The activity using ADAM is {} Bq".format(sum(In.ravel())/3600))
+
+plt.show()
