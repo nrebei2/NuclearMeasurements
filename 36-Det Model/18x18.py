@@ -94,6 +94,25 @@ R9 = np.array(changeOutsiders(R9))
 Zero = np.zeros((R0.shape[0], 144))
 
 
+R = np.vstack((np.hstack((R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)), #17.5
+                   np.hstack((R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero, Zero)), #18.5
+                   np.hstack((R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero)), #19.5
+                   np.hstack((R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero)), #newpos1
+                   np.hstack((R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero)), #newpos2
+                   np.hstack((R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero)), #corner1
+                   np.hstack((R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero)), #newpos3
+                   np.hstack((R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero)), #newpos4
+                   np.hstack((R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9)),  # 25o5
+                   np.hstack((R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8)),  # 25o6
+                   np.hstack((Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7)),  # 25o7
+                   np.hstack((Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6)),  # 25o8
+                   np.hstack((Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5)),  # newpos5
+                   np.hstack((Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4)),  # newpos6
+                   np.hstack((Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3)),  # corner2
+                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2)),  # newpos7
+                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1)),  # newpos8
+                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0))))  # 31.0
+
 # R = np.vstack((np.hstack((R0, R1, R2, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)), #17.5
 #                np.hstack((R1, R0, R1, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)), #18.5
 #                np.hstack((R2, R1, R0, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)), #19.5
@@ -121,7 +140,92 @@ R = np.vstack((np.hstack((R0, R1, R2, R3, Zero, Zero, Zero)), #19.5
                 np.hstack((Zero, Zero, Zero, R2, R1, R0, R1)),
                 np.hstack((Zero, Zero, Zero, R3, R2, R1, R0))))
 
+# R = np.vstack((np.hstack((R0, R1, R2, R3, R4, R5, R6, R7, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)), #17.5
+#                np.hstack((R1, R0, R1, R2, R3, R4, R5, R6, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)), #18.5
+#                np.hstack((R2, R1, R0, R1, R2, R3, R4, R5, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)), #19.5
+#                np.hstack((R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero)), #newpos1
+#                np.hstack((R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero)), #newpos2
+#                np.hstack((R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero)), #corner1
+#                np.hstack((R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero)), #newpos3
+#                np.hstack((R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero)), #newpos4
+#                np.hstack((Zero, Zero, Zero, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, Zero)),  # 25o5
+#                np.hstack((Zero, Zero, Zero, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, Zero)),  # 25o6
+#                np.hstack((Zero, Zero, Zero, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, Zero)),  # 25o7
+#                np.hstack((Zero, Zero, Zero, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, Zero)),  # 25o8
+#                np.hstack((Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5)),  # newpos5
+#                np.hstack((Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4)),  # newpos6
+#                np.hstack((Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3)),  # corner2
+#                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2)),  # newpos7
+#                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1)),  # newpos8
+#                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R5, R4, R3, R2, R1, R0))))  # 31.0
 
+# R2 = np.vstack((np.hstack((R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # 17.5
+#                np.hstack((R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # 18.5
+#                np.hstack((R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero)),  # 19.5
+#                np.hstack((R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero)),  # newpos1
+#                np.hstack((R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero)),  # newpos2
+#                np.hstack((R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero)),  # corner1
+#                np.hstack((R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero)),  # newpos3
+#                np.hstack((R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero)),  # newpos4
+#                np.hstack((R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9)),  # 25o5
+#                np.hstack((R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8)),  # 25o6
+#                np.hstack((Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7)),  # 25o7
+#                np.hstack((Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6)),  # 25o8
+#                np.hstack((Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5)),  # newpos5
+#                np.hstack((Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4)),  # newpos6
+#                np.hstack((Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3)),  # corner2
+#                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2)),  # newpos7
+#                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1)),  # newpos8
+#                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0))))  # 31.0
+
+# R = np.vstack((np.hstack((R0, R1, R2, R4, Zero, Zero, Zero, Zero, Zero, Zero)),     # 17.5
+#                np.hstack((R1, R0, R1, R3, Zero, Zero, Zero, Zero, Zero, Zero)),     # 18.5
+#                np.hstack((R2, R1, R0, R2, Zero, Zero, Zero, Zero, Zero, Zero)),     # 19.5
+#                np.hstack((Zero, Zero, R2, R0, R2, Zero, Zero, Zero, Zero, Zero)),   # corner1
+#                np.hstack((Zero, Zero, Zero, R2, R0, R1, R2, R3, R5, Zero)),         # 25o5
+#                np.hstack((Zero, Zero, Zero, R3, R1, R0, R1, R2, R4, Zero)),         # 25o6
+#                np.hstack((Zero, Zero, Zero, R4, R2, R1, R0, R1, R3, Zero)),         # 25o7
+#                np.hstack((Zero, Zero, Zero, R5, R3, R2, R1, R0, R2, Zero)),         # 25o8
+#                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, R2, R0, R2)),   # corner2
+#                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R2, R0))))# 31.0
+
+# R = np.vstack((np.hstack((R0, R1, R2, R7, Zero, Zero, Zero, Zero, Zero, Zero)),  # 17.5
+#                np.hstack((R1, R0, R1, R6, Zero, Zero, Zero, Zero, Zero, Zero)),  # 18.5
+#                np.hstack((R2, R1, R0, R5, Zero, Zero, Zero, Zero, Zero, Zero)),  # 19.5
+#                np.hstack((R7, R6, R5, R0, R5, R6, R7, R8, R9, Zero)),  # corner1
+#                np.hstack((Zero, Zero, Zero, R5, R0, R1, R2, R3, R4, Zero)),  # 25o5
+#                np.hstack((Zero, Zero, Zero, R6, R1, R0, R1, R2, R3, Zero)),  # 25o6
+#                np.hstack((Zero, Zero, Zero, R7, R2, R1, R0, R1, R2, Zero)),  # 25o7
+#                np.hstack((Zero, Zero, Zero, R8, R3, R2, R1, R0, R1, Zero)),  # 25o8
+#                np.hstack((Zero, Zero, Zero, R9, R8, R7, R6, R5, R0, R5)),  # corner2
+#                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R5, R0))))  # 31.0
+
+# R = np.vstack((np.hstack((R0, R1, R2, R7, R8, R9, Zero, Zero, Zero, Zero)),  # 17.5
+#                np.hstack((R1, R0, R1, R6, R7, R8, R9, Zero, Zero, Zero)),  # 18.5
+#                np.hstack((R2, R1, R0, R5, R6, R7, R8, R9, Zero, Zero)),  # 19.5
+#                np.hstack((R7, R6, R5, R0, R5, R6, R7, R8, R9, Zero)),  # corner1
+#                np.hstack((R8, R7, R6, R5, R0, R1, R2, R3, R8, R9)),  # 25o5
+#                np.hstack((R9, R8, R7, R6, R1, R0, R1, R2, R7, R8)),  # 25o6
+#                np.hstack((Zero, R9, R8, R7, R2, R1, R0, R1, R6, R7)),  # 25o7
+#                np.hstack((Zero, Zero, R9, R8, R3, R2, R1, R0, R5, R6)),  # 25o8
+#                np.hstack((Zero, Zero, Zero, R9, R8, R7, R6, R5, R0, R5)),  # corner2
+#                np.hstack((Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R0))))  # 31.0
+
+# R = np.vstack((np.hstack((R0, R1, R2, R3, R4, R5, R6, R7, R8, R9)),   # 17.5
+#                np.hstack((R1, R0, R1, R2, R3, R4, R5, R6, R7, R8)),   # 18.5
+#                np.hstack((R2, R1, R0, R1, R2, R3, R4, R5, R6, R7)),   # 19.5
+#                np.hstack((R3, R2, R1, R0, R1, R2, R3, R4, R5, R6)),   # corner1
+#                np.hstack((R4, R3, R2, R1, R0, R1, R2, R3, R4, R5)),   # 25o5
+#                np.hstack((R5, R4, R3, R2, R1, R0, R1, R2, R3, R4)),   # 25o6
+#                np.hstack((R6, R5, R4, R3, R2, R1, R0, R1, R2, R3)),   # 25o7
+#                np.hstack((R7, R6, R5, R4, R3, R2, R1, R0, R1, R2)),   # 25o8
+#                np.hstack((R8, R7, R6, R5, R4, R3, R2, R1, R0, R1)),   # corner2
+#                np.hstack((R9, R8, R7, R6, R5, R4, R3, R2, R1, R0))))  # 31.0
+
+# R = np.vstack((np.hstack((R0, R1, R2, R3)),
+#                np.hstack((R1, R0, R1, R2)),
+#                np.hstack((R2, R1, R0, R1)),
+#                np.hstack((R3, R2, R1, R0))))
 
 fig, ax = plt.subplots(6, 6, figsize=(6, 6))
 dets = []

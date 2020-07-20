@@ -28,11 +28,22 @@ def fillOut(Out, sheet):
     # del Out[-1]
 
 if Source == "PipeSource":
-    #Sheets = ["17.5", "18.5", "19.5", "newpos1", "newpos2", "corner1", "newpos3", "newpos4", "25o5", "25o6", "25o7", "25o8", "newpos5", "newpos6", "corner2", "newpos7", "newpos8", "31.0"]
-    #Sheets = ["17.5", "18.5", "19.5", "25o5", "25o6", "25o7", "25o8", "31.0"]
-    Sheets = ["25o5", "25o6", "25o7", "25o8"]
+    numberOfNew = 4
+
+    Sheets = ["17.5", "18.5", "19.5",  "newpos1", "newpos2", "corner1", "newpos3", "newpos4",  "25o5", "25o6", "25o7", "25o8", "newpos5", "newpos6", "corner2", "newpos7", "newpos8", "31.0"]
+    #Sheets = ["17.5", "18.5", "19.5", "corner1", "25o5", "25o6", "25o7", "25o8", "corner2",  "31.0"]
+
     for i in range(len(Sheets)):
-        fillOut(Out, Sheets[i])
+        df = xl.parse(Sheets[i])
+        Out.extend(list(np.asarray(df.iloc[:, 0])))
+        # if Sheets[i] in ("19.5", "corner1", "25o8", "corner2"):
+        #     for j in range(numberOfNew):
+        #         j = j+1
+        #         list1 = np.asarray(df.iloc[:, 0])
+        #         df = xl.parse(Sheets[j])
+        #         list2 = np.asarray(df.iloc[:, 0])
+        #         Out.extend(list(list1 + (list2 - list1) * j/numberOfNew))
+
 
 else:
     Sheets = ['Sheet1', 'Sheet2', 'Sheet3', 'Sheet4', 'Sheet5', 'Sheet6']
@@ -56,10 +67,8 @@ Out = np.asarray(Out)
 #Out = np.asarray(list(chain.from_iterable(Out)))
 
 
-# why does dividing this introduce noise? Fixed, had to start minimization with zero
 max = max(Out)
 Out = Out/np.max(Out)
-
 
 R = []
 xl = pd.ExcelFile('../Data/NewRespMatr.xlsx')
@@ -195,18 +204,6 @@ if WantToGraph:
     R9 = np.array(changeOutsiders(R9))
     Zero = np.zeros((R0.shape[0], 144))
 
-# R = np.vstack((np.hstack((R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),
-#                np.hstack((Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),
-#                np.hstack((Zero, Zero, R9, R8, R7, R6,  R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),
-#                np.hstack((Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),
-#                np.hstack((Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero)),
-#                np.hstack((Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero)),
-#                 np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero)),
-#                 np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero)),
-#                 np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero)),
-#                 np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero)),
-#                 np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9))))
-
 # Assuming we do not know the shape of the pipe after our count measurements
 # I think its better since:
 # 1. Solution seems to be very similar to above response matrix
@@ -216,48 +213,100 @@ if WantToGraph:
     # incorrect the further away from 0 where the counts was the greatest. This can be seen in how the solution for
     # source1 drops after z=2. This can be fixed a bit by stopping the minimization from going on too long after solving.
 
+
 if Source == "PipeSource":
-    R = np.vstack((np.hstack((R0, R1, R2, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # 17.5
-                   np.hstack((R1, R0, R1, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # 18.5
-                   np.hstack((R2, R1, R0, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # 19.5
-                   np.hstack((Zero, Zero, Zero, R0, R1, R2, R3, R4, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # newpos1
-                   np.hstack((Zero, Zero, Zero, R1, R0, R1, R2, R3, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # newpos2
-                   np.hstack((Zero, Zero, Zero, R2, R1, R0, R1, R2, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # corner1
-                   np.hstack((Zero, Zero, Zero, R3, R2, R1, R0, R1, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # newpos3
-                   np.hstack((Zero, Zero, Zero, R4, R3, R2, R1, R0, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # newpos4
-                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R0, R1, R2, R3, Zero, Zero, Zero, Zero, Zero, Zero)),  # 25o5
-                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R1, R0, R1, R2, Zero, Zero, Zero, Zero, Zero, Zero)),  # 25o6
-                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R2, R1, R0, R1, Zero, Zero, Zero, Zero, Zero, Zero)),  # 25o7
-                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R3, R2, R1, R0, Zero, Zero, Zero, Zero, Zero, Zero)),  # 25o8
-                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R0, R1, R2, R3, R4, Zero)),  # newpos5
-                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R1, R0, R1, R2, R3, Zero)),  # newpos6
-                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R2, R1, R0, R1, R2, Zero)),  # corner2
-                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R3, R2, R1, R0, R1, Zero)),  # newpos7
-                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R4, R3, R2, R1, R0, Zero)),  # newpos8
-                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R0))))  # 31.0
+    R = []
+    length = len(Sheets) + numberOfNew * 4
+    for j in range(length):
+        R.append(np.hstack([Zero] * (j-9) + ([R9, R8, R7, R6, R5, R4, R3, R2, R1][-j:] if j > 0 else []) + [R0, R1, R2, R3, R4, R5, R6, R7, R8, R9][0:length-j] + [Zero] * (length-10-j)))
+    R = np.vstack(R)
 
-    R = np.vstack((np.hstack((R0, R1, R2, R3)),
-                   np.hstack((R1, R0, R1, R2)),
-                   np.hstack((R2, R1, R0, R1)),
-                   np.hstack((R3, R2, R1, R0))))
+    # R = np.vstack((np.hstack((R0, R1, R2, R3, R4, R5, R6, R7, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)), #17.5
+    #                np.hstack((R1, R0, R1, R2, R3, R4, R5, R6, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)), #18.5
+    #                np.hstack((R2, R1, R0, R1, R2, R3, R4, R5, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)), #19.5
+    #                np.hstack((R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero)), #newpos1
+    #                np.hstack((R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero)), #newpos2
+    #                np.hstack((R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero)), #corner1
+    #                np.hstack((R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero)), #newpos3
+    #                np.hstack((R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero)), #newpos4
+    #                np.hstack((Zero, Zero, Zero, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, Zero)),  # 25o5
+    #                np.hstack((Zero, Zero, Zero, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, Zero)),  # 25o6
+    #                np.hstack((Zero, Zero, Zero, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, Zero)),  # 25o7
+    #                np.hstack((Zero, Zero, Zero, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, Zero)),  # 25o8
+    #                np.hstack((Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5)),  # newpos5
+    #                np.hstack((Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4)),  # newpos6
+    #                np.hstack((Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3)),  # corner2
+    #                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2)),  # newpos7
+    #                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1)),  # newpos8
+    #                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R5, R4, R3, R2, R1, R0))))  # 31.0
 
-    # R = np.vstack((np.hstack((R0, R1, R2, R3, R4, R5, R6, R7)),
-    #              np.hstack((R1, R0, R1, R2, R3, R4, R5, R6)),
-    #               np.hstack((R2, R1, R0, R1, R2, R3, R4, R5)),
-    #               np.hstack((R3, R2, R1, R0, R1, R2, R3, R4)),
-    #               np.hstack((R4, R3, R2, R1, R0, R1, R2, R3)),
-    #               np.hstack((R5, R4, R3, R2, R1, R0, R1, R2)),
-    #               np.hstack((R6, R5, R4, R3, R2, R1, R0, R1)),
-    #               np.hstack((R7, R6, R5, R4, R3, R2, R1, R0))))
+    R = np.vstack((np.hstack((R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # 17.5
+                   np.hstack((R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero, Zero)),  # 18.5
+                   np.hstack((R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero, Zero)),  # 19.5
+                   np.hstack((R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero, Zero)),  # newpos1
+                   np.hstack((R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero, Zero)),  # newpos2
+                   np.hstack((R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero, Zero)),  # corner1
+                   np.hstack((R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero, Zero)),  # newpos3
+                   np.hstack((R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero)),  # newpos4
+                   np.hstack((R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8, R9)),  # 25o5
+                   np.hstack((R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7, R8)),  # 25o6
+                   np.hstack((Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6, R7)),  # 25o7
+                   np.hstack((Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5, R6)),  # 25o8
+                   np.hstack((Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4, R5)),  # newpos5
+                   np.hstack((Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3, R4)),  # newpos6
+                   np.hstack((Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2, R3)),  # corner2
+                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1, R2)),  # newpos7
+                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0, R1)),  # newpos8
+                   np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R4, R3, R2, R1, R0))))  # 31.0
 
-    # R = np.vstack((np.hstack((R0, R1, R2, R7, R8, R9, Zero, Zero)),
-    #                np.hstack((R1, R0, R1, R6, R7, R8, R9, Zero)),
-    #                np.hstack((R2, R1, R0, R5, R6, R7, R8, R9)),
-    #                np.hstack((R7, R6, R5, R0, R1, R2, R3, R4)),
-    #                np.hstack((R8, R7, R6, R1, R0, R1, R2, R3)),
-    #                np.hstack((R9, R8, R7, R2, R1, R0, R1, R2)),
-    #                np.hstack((Zero, R9, R8, R3, R2, R1, R0, R1)),
-    #                np.hstack((Zero, Zero, R9, R8, R7, R6, R5, R0))))
+    # R = np.vstack((np.hstack((R0, R1, R2, R4, Zero, Zero, Zero, Zero, Zero, Zero)),     # 17.5
+    #                np.hstack((R1, R0, R1, R3, Zero, Zero, Zero, Zero, Zero, Zero)),     # 18.5
+    #                np.hstack((R2, R1, R0, R2, Zero, Zero, Zero, Zero, Zero, Zero)),     # 19.5
+    #                np.hstack((Zero, Zero, R2, R0, R2, Zero, Zero, Zero, Zero, Zero)),   # corner1
+    #                np.hstack((Zero, Zero, Zero, R2, R0, R1, R2, R3, R5, Zero)),         # 25o5
+    #                np.hstack((Zero, Zero, Zero, R3, R1, R0, R1, R2, R4, Zero)),         # 25o6
+    #                np.hstack((Zero, Zero, Zero, R4, R2, R1, R0, R1, R3, Zero)),         # 25o7
+    #                np.hstack((Zero, Zero, Zero, R5, R3, R2, R1, R0, R2, Zero)),         # 25o8
+    #                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, R2, R0, R2)),   # corner2
+    #                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R2, R0))))# 31.0
+
+    # R = np.vstack((np.hstack((R0, R1, R2, R7, Zero, Zero, Zero, Zero, Zero, Zero)),  # 17.5
+    #                np.hstack((R1, R0, R1, R6, Zero, Zero, Zero, Zero, Zero, Zero)),  # 18.5
+    #                np.hstack((R2, R1, R0, R5, Zero, Zero, Zero, Zero, Zero, Zero)),  # 19.5
+    #                np.hstack((R7, R6, R5, R0, R5, R6, R7, R8, R9, Zero)),  # corner1
+    #                np.hstack((Zero, Zero, Zero, R5, R0, R1, R2, R3, R4, Zero)),  # 25o5
+    #                np.hstack((Zero, Zero, Zero, R6, R1, R0, R1, R2, R3, Zero)),  # 25o6
+    #                np.hstack((Zero, Zero, Zero, R7, R2, R1, R0, R1, R2, Zero)),  # 25o7
+    #                np.hstack((Zero, Zero, Zero, R8, R3, R2, R1, R0, R1, Zero)),  # 25o8
+    #                np.hstack((Zero, Zero, Zero, R9, R8, R7, R6, R5, R0, R5)),  # corner2
+    #                np.hstack((Zero, Zero, Zero, Zero, Zero, Zero, Zero, Zero, R5, R0))))  # 31.0
+
+    # R = np.vstack((np.hstack((R0, R1, R2, R7, R8, R9, Zero, Zero, Zero, Zero)),  # 17.5
+    #                np.hstack((R1, R0, R1, R6, R7, R8, R9, Zero, Zero, Zero)),  # 18.5
+    #                np.hstack((R2, R1, R0, R5, R6, R7, R8, R9, Zero, Zero)),  # 19.5
+    #                np.hstack((R7, R6, R5, R0, R5, R6, R7, R8, R9, Zero)),  # corner1
+    #                np.hstack((R8, R7, R6, R5, R0, R1, R2, R3, R8, R9)),  # 25o5
+    #                np.hstack((R9, R8, R7, R6, R1, R0, R1, R2, R7, R8)),  # 25o6
+    #                np.hstack((Zero, R9, R8, R7, R2, R1, R0, R1, R6, R7)),  # 25o7
+    #                np.hstack((Zero, Zero, R9, R8, R3, R2, R1, R0, R5, R6)),  # 25o8
+    #                np.hstack((Zero, Zero, Zero, R9, R8, R7, R6, R5, R0, R5)),  # corner2
+    #                np.hstack((Zero, Zero, Zero, Zero, R9, R8, R7, R6, R5, R0))))  # 31.0
+
+    # R = np.vstack((np.hstack((R0, R1, R2, R3, R4, R5, R6, R7, R8, R9)),   # 17.5
+    #                np.hstack((R1, R0, R1, R2, R3, R4, R5, R6, R7, R8)),   # 18.5
+    #                np.hstack((R2, R1, R0, R1, R2, R3, R4, R5, R6, R7)),   # 19.5
+    #                np.hstack((R3, R2, R1, R0, R1, R2, R3, R4, R5, R6)),   # corner1
+    #                np.hstack((R4, R3, R2, R1, R0, R1, R2, R3, R4, R5)),   # 25o5
+    #                np.hstack((R5, R4, R3, R2, R1, R0, R1, R2, R3, R4)),   # 25o6
+    #                np.hstack((R6, R5, R4, R3, R2, R1, R0, R1, R2, R3)),   # 25o7
+    #                np.hstack((R7, R6, R5, R4, R3, R2, R1, R0, R1, R2)),   # 25o8
+    #                np.hstack((R8, R7, R6, R5, R4, R3, R2, R1, R0, R1)),   # corner2
+    #                np.hstack((R9, R8, R7, R6, R5, R4, R3, R2, R1, R0))))  # 31.0
+
+    # R = np.vstack((np.hstack((R0, R1, R2, R3)),
+    #                np.hstack((R1, R0, R1, R2)),
+    #                np.hstack((R2, R1, R0, R1)),
+    #                np.hstack((R3, R2, R1, R0))))
 
 else:
     R = np.vstack((np.hstack((R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, Zero)),
@@ -314,11 +363,17 @@ if Method in ["bvls", "trf"]:
                        tol=1e-10,
                        verbose=2)['x']
 
+BaseIn = []
+with open("file.txt", "r") as f:
+  for line in f:
+    BaseIn.append(float(line.strip()))
+
 from scipy.sparse.linalg import svds
 if Method == "fista":
 
     # Why use svd to compute the step step-size of fista
     u, s, vt = svds(R, 1, which='LM')  # svd
+
     L = s[0] ** 2
 
     # solving
@@ -337,7 +392,9 @@ if Method == "fista":
     lam = 10E-8  # tune this parameter to get better result
     max_iter = 2000
     results = []
+    mse = []
     err = np.zeros(max_iter)
+    mse = np.zeros(max_iter)
     for k in np.arange(0, max_iter):
         # print(k)
         xp = z - 1 / L * R.T @ (R @ z - Out)
@@ -348,19 +405,30 @@ if Method == "fista":
         t = tp
         x = xp
         err[k] = np.linalg.norm(Out - R.dot(x))
+        #mse[k] = ((BaseIn - x)**2).mean(axis=None)
         if k % 10 == 0:
             results.append(x)
         # Stops loop when error difference is small -- Prevents overfitting??
         if np.abs(err[k] - err[k-1])/err[k] <= 10 ** -4.5: #or err[k] <= 10E-3 and k >= 1:
             break
+        if k == 100:
+            break
     In = results[-1]
 
-    fig, ax1 = plt.subplots(1, 1, figsize=(8, 4.5))
+    fig, ax1 = plt.subplots(2, 1, figsize=(8, 4.5))
     # ax1.set_title("Reconstruction\nFiltered back projection")
-    ax1.plot(np.arange(0, max_iter), err)
+    ax1[0].plot(np.arange(0, max_iter), err)
     # ax1.set_yscale('log')
-    ax1.set_xlabel('Iteration')
-    ax1.set_ylabel('$||Ax-y||$')
+    ax1[0].set_xlabel('Iteration')
+    ax1[0].set_ylabel('$||Ax-y||$')
+
+    ax1[1].plot(np.arange(0, max_iter), mse)
+    # ax1.set_yscale('log')
+    ax1[1].set_xlabel('Iteration')
+    ax1[1].set_ylabel('mse')
+
+index_min = min(range(len(mse)), key=mse.__getitem__)
+print(index_min)
 
 def noisy_val_grad(theta_hat, data_, label_, deg, lamba):
     gradient = np.zeros_like(theta_hat)
@@ -370,13 +438,13 @@ def noisy_val_grad(theta_hat, data_, label_, deg, lamba):
         x_ = data_[i, :].reshape(-1, 1)
         y_ = label_[i, 0]
         err = np.matmul(np.transpose(x_), theta_hat) - y_
-        if theta_hat[i] == 0:
-            grad = 2 * (np.matmul(np.transpose(x_), theta_hat) - y_) * x_ * (
-                    np.absolute(np.matmul(np.transpose(x_), theta_hat) - y_) ** (deg - 2))
-        else:
-            grad = 2 * (np.matmul(np.transpose(x_), theta_hat) - y_) * x_ * (
-                    np.absolute(np.matmul(np.transpose(x_), theta_hat) - y_) ** (deg - 2)) \
-                   + lamba * np.abs(theta_hat[i])/theta_hat[i]
+        #if theta_hat[i] == 0:
+        grad = 2 * (np.matmul(np.transpose(x_), theta_hat) - y_) * x_ * (
+                np.absolute(np.matmul(np.transpose(x_), theta_hat) - y_) ** (deg - 2))
+        # else:
+        #     grad = 2 * (np.matmul(np.transpose(x_), theta_hat) - y_) * x_ * (
+        #             np.absolute(np.matmul(np.transpose(x_), theta_hat) - y_) ** (deg - 2)) \
+        #            + lamba * np.abs(theta_hat[i])/theta_hat[i]
         #print(grad.shape)
         l = np.abs(err) ** deg
         loss += l / data_.shape[0]
@@ -457,7 +525,7 @@ if Method == 'adam':
 
         In = np.asarray([[i] for i in np.maximum(In, 0).ravel()])
         # 10E-4 works best for source1
-        if np.abs(err[t] - err[t-1])/err[t] <= 10 ** -4: # or err[t] <= 10E-3 and t >= 1:
+        if np.abs(err[t] - err[t-1])/err[t] <= 10 ** -4.5: # or err[t] <= 10E-3 and t >= 1:
             break
 
     fig, ax1 = plt.subplots(1, 1, figsize=(8, 4.5))
@@ -469,13 +537,19 @@ if Method == 'adam':
     #print(np.matmul(R,In) - Out)
     #print(np.matmul(R,In) - Out)
 
+
+# with open("file.txt", "w") as f:
+#     for s in In:
+#         f.write(str(s) +"\n")
+
 In = In*max
 print("The activity using " + Method + " is {} Bq".format(sum(In.ravel())))
+
 
 # Add calculated activity
 # Sheets = ['Point Source', 'Source1', 'Source2']
 #
-# wb = load_workbook('../Data/Pixel Activity Data.xlsx')
+# wb = load_workbook('../Data/Pixel Activity Data_S_shape.xlsx')
 # ws1 = wb[Sheets[0]]
 #
 # coorinates = []
@@ -494,7 +568,7 @@ print("The activity using " + Method + " is {} Bq".format(sum(In.ravel())))
 # for i in range(len(coorinates)):
 #     ws1.cell(row=i+2, column=1).value = coorinates[i]
 #
-# wb.save('../Data/Pixel Activity Data.xlsx')
+# wb.save('../Data/Pixel Activity Data_S_shape.xlsx')
 
 
 
@@ -502,15 +576,17 @@ if WantToGraph:
     In = np.array_split(In, np.shape(R)[1]/144)
     In = np.asarray(In)
 
+    #print(In)
     # plt.imshow(In[4].reshape(12,12))
 
     fig.suptitle(Source + ', ' + Method, fontsize=16)
     if Source == "PipeSource":
         startingz = currentz = 0
-        x = 2
-        y = 2
+        x = 3
+        y = 6
     else:
-        startingz = currentz = -5
+        startingz = 5
+        currentz = -5
         x = 3
         y = 4
 
@@ -524,7 +600,7 @@ if WantToGraph:
                 matfig = ax[i][j].imshow(np.log(In[currentz + startingz].reshape(12, 12) + 0.001), extent=[-6, 6, -6, 6],
                                          origin='lower', vmin=0, vmax=np.log(np.amax(In)))
             if not LogScale:
-                matfig = ax[i][j].imshow(In[currentz + startingz].reshape(12, 12) + 0.001, extent=[-6, 6, -6, 6],
+                matfig = ax[i][j].imshow(In[currentz + startingz].reshape(12, 12), extent=[-6, 6, -6, 6],
                                          origin='lower', vmin=0, vmax=np.amax(In))
 
             # plot the pipe
@@ -535,12 +611,13 @@ if WantToGraph:
             ax[i][j].add_artist(circle2)
 
             # labels
-            ax[i][j].set_xlabel('x (cm)')
-            ax[i][j].set_ylabel('y (cm)')
-            if Source == "PipeSource":
-                ax[i][j].set_title(Sheets[currentz])
-            else:
-                ax[i][j].set_title('z = {} cm'.format(currentz))
+            # ax[i][j].set_xlabel('x (cm)')
+            # ax[i][j].set_ylabel('y (cm)')
+            # if Source == "PipeSource":
+            #     ax[i][j].set_title('z = {} cm'.format(currentz))
+            #     #ax[i][j].set_title(Sheets[currentz])
+            # else:
+            #     ax[i][j].set_title('z = {} cm'.format(currentz))
 
             fig.tight_layout()
             currentz += 1

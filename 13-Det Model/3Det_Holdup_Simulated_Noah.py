@@ -53,8 +53,8 @@ print(np.array(R))
 ## convert your array into a dataframe
 df = pd.DataFrame (R)
 ## save to xlsx file
-filepath = '../Data/3DetR_cut.xlsx'
-df.to_excel(filepath, index=False)
+#filepath = '../Data/3DetR_cut.xlsx'
+#df.to_excel(filepath, index=False)
 
 # Calculating In with a Bounded-Variable Least-Squares algorithm
 In = op.lsq_linear(R, Out, (0, np.inf),
